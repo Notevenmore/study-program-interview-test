@@ -34,6 +34,10 @@ class StudyProgramControllers extends Controller
           $short_name .= strtoupper($name[0]);
       }
 
+      if(count($explode_name) == 1) {
+        $short_name .= $short_name;
+      }
+
       StudyProgram::create([
         'name' => $validatedData['name'],
         'code' => $validatedData['code'],
