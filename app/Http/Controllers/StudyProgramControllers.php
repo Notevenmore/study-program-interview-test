@@ -21,4 +21,14 @@ class StudyProgramControllers extends Controller
       'faculties' => $faculty
     ]);
   }
+
+  public function edit($id) {
+    $study_program = StudyProgram::with('faculty')->where(['id' => $id])->get();
+    // dd($study_program[0]->faculty->name);
+    $faculty = Faculty::all();
+    return view('update', [
+      'study_program' => $study_program[0],
+      'faculties' => $faculty
+    ]);
+  }
 }

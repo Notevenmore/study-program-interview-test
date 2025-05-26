@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\StudyProgram;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class StudyProgramControllers extends Controller
 {
@@ -59,7 +60,29 @@ class StudyProgramControllers extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+      $validatedData = $request->validate([
+        'name' => ['required','string','regex:/^[a-zA-Z\s]+$/', Rule::unique('study_programs', 'name')->ignore($id)],
+        'code' => ['required','string', Rule::unique('study_programs', 'code')->ignore($id)],
+        'faculty' => 'required'
+      ]);
+
+      $explode_name = explode(' ', $validatedData['name']);
+      $short_name = '';
+      foreach ($explode_name as $name) {
+          $short_name .= strtoupper($name[0]);
+      }
+
+      StudyProgram::where(['id' => $id])->update([
+        'name' => $validatedData['name'],
+        'code' => $validatedData['code'],
+        'short_name' => $short_name,
+        'faculty_id' => (int) ($validatedData['faculty'])
+      ]);
+
+      return response()->json([
+        'message' => "Program Studi berhasil terupdate",
+        (int) ($validatedData['faculty'])
+      ], 201);
     }
 
     /**
@@ -67,6 +90,7 @@ class StudyProgramControllers extends Controller
      */
     public function destroy(string $id)
     {
-        //
+      StudyProgram::destroy($id);
+      return response()->json(['message'=>'Program studi berhasil dihapus'], 201);
     }
 }
